@@ -1,15 +1,18 @@
-int btn_pulldown = 13;
-void setup()
-{
-  pinMode(13, INPUT);
-  pinMode(12, INPUT);
+int prev = 1;
+int current = 1;
+bool v2 = false;
+void setup() {
+  pinMode(2, INPUT);
+  pinMode(13, OUTPUT);
   Serial.begin(9600);
 }
 
 void loop() {
-      Serial.print(digitalRead(13));
-      Serial.print(" ");
-      Serial.print(digitalRead(12));
-      Serial.print("\n");
+  
+      v2 = digitalRead(2);
+      Serial.print(current);
+      if (v2 == 1){prev = current++;}
+      if (current % 2 == 0) digitalWrite(13, 1);
+      if (current % 2 != 0) digitalWrite(13, 0);
       delay(500);
 }
