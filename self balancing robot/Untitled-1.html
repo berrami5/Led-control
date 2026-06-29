@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP PID controller</title>
+    <style>
+        input {
+            border-radius: 15px;
+            
+        }
+        .elm {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+        button {
+            height: 40px;
+            width: 40px;
+            margin-top: 20px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="elm">
+    <h1 id="pV">P:</h1>
+    <button>-</button>
+    <input type="range" id="p" class="inp">
+    <button>+</button>
+    </div>
+    <br>
+    <div class="elm">
+    <h1 id="iV">I:</h1>
+    <button>-</button>
+    <input type="range" id="i" class="inp">
+    <button>+</button>
+    </div>
+    <br>
+    <div class="elm">
+    <h1 id="dV">D:</h1>
+    <button>-</button>
+    <input type="range" id="d" class="inp">
+    <button>+</button>
+    </div>
+    <div class="elm">
+        <h1 id="powerV">Power:</h1>
+        <button>-</button>
+        <input type="range" style="height: 35px;" min="0" max="255" value="100" id="power" class="inp">
+        <button>+</button>
+    </div>
+    <script>
+        let url = "http://192.168.60.116/pid"  
+        let pV = document.querySelector("#pV") 
+        let pI = document.querySelector("#iV") 
+        let pD = document.querySelector("#dV") 
+        let powerV = document.querySelector("#powerV") 
+        
+        
+        document.querySelectorAll(".inp").forEach(e => {
+            document.querySelectorAll("button").forEach((e , i) => {
+                    e.addEventListener("click" , () =>  {
+                        let temp = Math.floor(i / 2)
+                        function eq () {
+                            return i % 2 == 0 ? -1 : +1
+                        }
+                        let p = +document.getElementById("p").value
+                        let integral = +document.getElementById("i").value
+                        let d = +document.getElementById("d").value
+                        let powerV = +document.getElementById("power").value
+                        if (temp == 0) p = p + eq()
+                        else if (temp == 1) integral = integral + eq()
+                        else if (temp == 2) d = d + eq()
+                        else powerV = powerV + eq()
+
+                        pV.innerText ="P:" + p
+                        pI.innerText ="I:" + integral
+                        pD.innerText ="D:" + d
+                        powerV.innerText = "Power:" + powerV
+                    })
+                })
+            e.addEventListener("click" , () => {
+                let p = document.getElementById("p").value
+                let i = document.getElementById("i").value
+                let d = document.getElementById("d").value
+                let power = document.getElementById("power").value
+                
+                pV.innerText ="P:" + p
+                pI.innerText ="I:" + i
+                pD.innerText ="D:" + d
+                powerV.innerText = "Power:" + power
+
+                
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "text/plain"
+                    },
+                    body: "{\"P\": " + String(p) + ", \"D\": " + String(d) + ", \"I\": " + String(i) + ", \"power\": " + String(power) + "}"
+                    })
+                    .then(res => res.text())
+                    .then(res=>console.log(res))
+                    })
+                })
+        
+    </script>
+</body>
+</html>
